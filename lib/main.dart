@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:android_multiple_identifier/android_multiple_identifier.dart';
+import 'dart:async';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
@@ -17,7 +16,6 @@ class _MyAppState extends State<MyApp> {
   String _serial = 'Unknown';
   String _androidID = 'Unknown';
 
-
   @override
   void initState() {
     super.initState();
@@ -30,14 +28,21 @@ class _MyAppState extends State<MyApp> {
     String imei;
     String serial;
     String androidID;
+
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       platformVersion = await AndroidMultipleIdentifier.platformVersion;
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
+
+    await AndroidMultipleIdentifier.requestPermissions();
+
+    try {
       imei = await AndroidMultipleIdentifier.imeiCode;
       serial = await AndroidMultipleIdentifier.serialCode;
       androidID = await AndroidMultipleIdentifier.androidID;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+    } catch (e) {
       imei = 'Failed to get IMEI.';
       serial = 'Failed to get Serial Code.';
       androidID = 'Failed to get Android id.';
@@ -64,11 +69,25 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-            child: Column(children: <Widget>[Text('\nRunning on: $_platformVersion\n'),
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              '\nRunning on: $_platformVersion\n',
+              textAlign: TextAlign.center,
+            ),
             Text('IMEI: $_imei\n'),
-            Text('Serial Code: $_serial\n'),
-            Text('Android ID: $_androidID\n'),],)
-        ),
+            Text(
+              'Serial Code: $_serial\n',
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Android ID: $_androidID\n',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        )),
       ),
     );
   }
